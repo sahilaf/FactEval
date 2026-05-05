@@ -37,21 +37,27 @@ _calibrator_path: str | None = None
 def _get_extractor() -> ClaimExtractor:
     global _extractor
     if _extractor is None:
+        print("⏳ Loading claim extractor (Qwen 1.5B)...", flush=True)
         _extractor = ClaimExtractor()
+        print("✅ Claim extractor ready.", flush=True)
     return _extractor
 
 
 def _get_retriever() -> EvidenceRetriever:
     global _retriever
     if _retriever is None:
+        print("⏳ Loading retriever (MiniLM + FAISS)...", flush=True)
         _retriever = EvidenceRetriever()
+        print("✅ Retriever ready.", flush=True)
     return _retriever
 
 
 def _get_verifier() -> Verifier:
     global _verifier
     if _verifier is None:
+        print("⏳ Loading verifier (DeBERTa NLI)...", flush=True)
         _verifier = Verifier()
+        print("✅ Verifier ready.", flush=True)
     return _verifier
 
 

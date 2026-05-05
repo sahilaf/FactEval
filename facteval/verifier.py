@@ -228,8 +228,8 @@ class Verifier:
         """Generate a human-readable reason for the verdict."""
         ev_short = evidence[:80] + "..." if len(evidence) > 80 else evidence
         if label == FactLabel.SUPPORTED:
-            return f"Supported by evidence: \"{ev_short}\""
+            return f"Matched evidence: \"{ev_short}\""
         elif label == FactLabel.CONTRADICTED:
-            return f"Contradicts evidence: \"{ev_short}\""
+            return f"Contradicted by: \"{ev_short}\""
         else:
-            return f"Evidence is neutral — neither confirms nor denies: \"{ev_short}\""
+            return f"No strong match — evidence is neutral: \"{ev_short}\""

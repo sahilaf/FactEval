@@ -107,7 +107,7 @@ def _parse_input(args) -> tuple[str | None, list[str]]:
     """Parse answer and contexts from file or CLI flags."""
     # Option 1: JSON file
     if args.input_file:
-        with open(args.input_file, "r", encoding="utf-8") as f:
+        with open(args.input_file, "r", encoding="utf-8-sig") as f:
             data = json.load(f)
         return data.get("answer"), data.get("contexts", [])
 
