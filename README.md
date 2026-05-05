@@ -10,6 +10,8 @@ Output:  Paris is the capital of Germany ❌
          → Contradicts evidence: "Paris is the capital of France."
 ```
 
+[![PyPI version](https://img.shields.io/pypi/v/facteval.svg)](https://pypi.org/project/facteval/)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/sahilfarib/FactEval)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-green.svg)](https://python.org)
 
@@ -40,8 +42,8 @@ pip install facteval
 
 For development:
 ```bash
-git clone https://github.com/sahilaf/facteval.git
-cd facteval && pip install -e ".[dev]"
+git clone https://github.com/sahilaf/FactEval.git
+cd FactEval && pip install -e ".[dev]"
 ```
 
 ---
