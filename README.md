@@ -26,7 +26,7 @@ FactEval verifies claims against provided reference context (e.g., retrieved doc
 
 ## ⚡ Try It Instantly
 
-> **[Live Demo on Hugging Face Spaces →](https://huggingface.co/spaces/YOUR_USERNAME/facteval)**
+> **[Live Demo on Hugging Face Spaces →](https://huggingface.co/spaces/sahilfarib/FactEval)**
 >
 > No setup needed — paste your text and see hallucinations highlighted in seconds.
 
@@ -40,7 +40,7 @@ pip install facteval
 
 For development:
 ```bash
-git clone https://github.com/your-repo/facteval.git
+git clone https://github.com/sahilaf/facteval.git
 cd facteval && pip install -e ".[dev]"
 ```
 
