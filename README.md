@@ -2,7 +2,9 @@
 
 **Find exactly which parts of your LLM output are hallucinated.**
 
-Debug hallucinations in LLM outputs like you debug code.
+Most LLM tools tell you if an answer is "good". FactEval tells you exactly which sentence is wrong — and why.
+
+**FactEval doesn't give you a score — it shows you the exact mistake.**
 
 ```
 Input:  "Paris is the capital of Germany."
@@ -26,11 +28,18 @@ FactEval verifies claims against provided reference context (e.g., retrieved doc
 
 ---
 
-## ⚡ Try It Instantly
+Built for debugging real-world RAG pipelines and LLM systems.
 
-> **[Live Demo on Hugging Face Spaces →](https://huggingface.co/spaces/sahilfarib/FactEval)**
->
-> No setup needed — paste your text and see hallucinations highlighted in seconds.
+## 👥 Who is this for?
+- RAG developers
+- LLM app builders
+- Anyone debugging hallucinations
+
+---
+
+## ⚡ Try it in 3 seconds
+
+👉 **[https://huggingface.co/spaces/sahilfarib/FactEval](https://huggingface.co/spaces/sahilfarib/FactEval)**
 
 ---
 
@@ -50,7 +59,12 @@ cd FactEval && pip install -e ".[dev]"
 
 ## 🚀 Quick Start
 
-**⚡ Note:** First run downloads and loads models (~15s). After that: **~0.3s per query**.
+**⚡ Note:** First run loads models (~15s). After that:
+- `fast_check()`: **~0.3s**
+- `analyze()`: **~1.3s**
+
+`fast_check()` = fastest, recommended
+`analyze()` = full pipeline (auto claim extraction)
 
 ```python
 from facteval import fast_check
@@ -74,23 +88,24 @@ contradicted    Paris has 5 million people.
 
 ### 🧪 Drop-in RAG Evaluator
 
-Paste this into your RAG app to instantly catch hallucinations:
+Paste this into your RAG app to instantly catch hallucinations.
+
+**Think of FactEval as:** `LLM output` → `broken into claims` → `verified against truth`
 
 ```python
 from facteval import fast_check
 
-# 1. Your existing pipeline
+# After your LLM call
 response = llm(query)
-docs = retriever(query)
 
-# 2. Drop-in evaluation
+# Validate before returning to user
 result = fast_check(
     claims=response.split("."),  # Simple claim splitting
     contexts=docs
 )
 
-if result["summary"]["contradicted"] > 0:
-    print("🚨 Hallucination detected! Halting response.")
+if result["summary"]["hallucination_rate"] > 0:
+    print("⚠️ Potential hallucination detected")
 ```
 
 ### Full Pipeline (Automated Extraction)
