@@ -138,7 +138,7 @@ with gr.Blocks(
     title="FactEval – Hallucination Detector",
     theme=gr.themes.Soft(primary_hue="blue", neutral_hue="slate"),
     css="""
-        .gradio-container { max-width: 960px !important; }
+        .gradio-container { max-width: 1400px !important; }
         footer { display: none !important; }
     """,
 ) as demo:
@@ -151,6 +151,7 @@ with gr.Blocks(
     )
 
     with gr.Row():
+        # LEFT COLUMN: Inputs & Examples
         with gr.Column(scale=1):
             answer_input = gr.Textbox(
                 label="LLM Answer",
@@ -170,30 +171,32 @@ with gr.Blocks(
                 lines=1,
             )
             check_btn = gr.Button("🔍 Check Factuality", variant="primary", size="lg")
+            
+            gr.Examples(
+                examples=EXAMPLES,
+                inputs=[answer_input, context_input],
+                label="Try these examples",
+            )
 
-    gr.Markdown("### 📝 Highlighted Answer")
-    highlighted_output = gr.HTML()
-
-    with gr.Row():
-        with gr.Column(scale=2):
-            gr.Markdown("### 📋 Claim Details")
-            details_output = gr.HTML()
+        # RIGHT COLUMN: Outputs
         with gr.Column(scale=1):
-            summary_output = gr.HTML()
+            gr.Markdown("### 📝 Highlighted Answer")
+            highlighted_output = gr.HTML()
 
-    with gr.Accordion("Raw JSON Output", open=False):
-        json_output = gr.Code(language="json")
+            with gr.Row():
+                with gr.Column(scale=2):
+                    gr.Markdown("### 📋 Claim Details")
+                    details_output = gr.HTML()
+                with gr.Column(scale=1):
+                    summary_output = gr.HTML()
+
+            with gr.Accordion("Raw JSON Output", open=False):
+                json_output = gr.Code(language="json")
 
     check_btn.click(
         fn=run_check,
         inputs=[answer_input, context_input, calibrator_input],
         outputs=[highlighted_output, details_output, summary_output, json_output],
-    )
-
-    gr.Examples(
-        examples=EXAMPLES,
-        inputs=[answer_input, context_input],
-        label="Try these examples",
     )
 
     demo.load(
