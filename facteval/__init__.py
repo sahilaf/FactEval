@@ -61,14 +61,17 @@ suppress_stdout = suppress_loading_noise
 
 
 # ── Public API ───────────────────────────────────────────────────────────────
-from facteval.core import check, verify
+from facteval.core import analyze, fast_check, check, verify, evaluate
 from facteval.models import Claim, Evidence, ClaimWithEvidence
 from facteval.verifier import FactLabel, VerificationResult
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = [
-    "check",
-    "verify",
+    "analyze",
+    "fast_check",
+    "evaluate",  # Drop-in evaluator alias
+    "check",     # Backcompat
+    "verify",    # Backcompat
     "Claim",
     "Evidence",
     "ClaimWithEvidence",

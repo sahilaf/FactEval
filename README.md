@@ -2,7 +2,7 @@
 
 **Find exactly which parts of your LLM output are hallucinated.**
 
-Debug hallucinations in RAG and LLM pipelines with claim-level verification.
+Debug hallucinations in LLM outputs like you debug code.
 
 ```
 Input:  "Paris is the capital of Germany."
@@ -50,15 +50,14 @@ cd FactEval && pip install -e ".[dev]"
 
 ## 🚀 Quick Start
 
-```python
-from facteval import check
+**⚡ Note:** First run downloads and loads models (~15s). After that: **~0.3s per query**.
 
-result = check(
-    answer="Paris is the capital of Germany and has 5 million people.",
-    contexts=[
-        "Paris is the capital of France. Paris has approximately 2.2 million inhabitants.",
-        "Germany's capital is Berlin.",
-    ],
+```python
+from facteval import fast_check
+
+result = fast_check(
+    claims=["Paris is the capital of Germany.", "Paris has 5 million people."],
+    contexts=["Paris is the capital of France. Population: 2.2M."],
 )
 
 for claim in result["claims"]:
@@ -66,25 +65,45 @@ for claim in result["claims"]:
     print(f'                → {claim["reason"]}')
 ```
 
-```
+```text
 contradicted    Paris is the capital of Germany.
-                → Contradicts evidence: "Paris is the capital of France."
+                → Contradicted by: "Paris is the capital of France."
 contradicted    Paris has 5 million people.
-                → Contradicts evidence: "Paris has approximately 2.2 million inhabitants."
+                → Contradicted by: "Population: 2.2M."
 ```
 
-### Lightweight Mode (up to 10x faster)
+### 🧪 Drop-in RAG Evaluator
 
-Already have claims? Skip extraction entirely:
+Paste this into your RAG app to instantly catch hallucinations:
 
 ```python
-from facteval import verify
+from facteval import fast_check
 
-result = verify(
-    claims=["Paris is the capital of Germany.", "Paris has 5 million people."],
-    contexts=["Paris is the capital of France. Population: 2.2M."],
+# 1. Your existing pipeline
+response = llm(query)
+docs = retriever(query)
+
+# 2. Drop-in evaluation
+result = fast_check(
+    claims=response.split("."),  # Simple claim splitting
+    contexts=docs
 )
-# No Qwen model loaded → ~0.5 GB VRAM, ~0.3s latency
+
+if result["summary"]["contradicted"] > 0:
+    print("🚨 Hallucination detected! Halting response.")
+```
+
+### Full Pipeline (Automated Extraction)
+
+If you don't want to split claims yourself, `analyze()` uses a lightweight LLM (Qwen 1.5B) to automatically decompose complex answers into atomic claims:
+
+```python
+from facteval import analyze
+
+result = analyze(
+    answer="Paris is the capital of Germany and has 5 million people.",
+    contexts=["Paris is the capital of France. Paris has approximately 2.2 million inhabitants."],
+)
 ```
 
 ### CLI (Command Line Interface)
@@ -109,9 +128,22 @@ facteval check input.json --calibrator calibrator.pkl
 - **Human-readable reasons** — every verdict explains *why*
 - **Pipeline diagnostics** — hallucination vs. retrieval gap vs. missing context
 - **Calibrated confidence** — isotonic regression for trustworthy probability scores
-- **Lightweight mode** — `verify()` skips extraction for up to 10x faster results
+- **Lightweight mode** — `fast_check()` runs instantly (~0.3s) without heavy models
+- **Drop-in API** — works seamlessly with LangChain, LlamaIndex, or custom pipelines
 - **Batch NLI** — all claims in a single forward pass
 - **CLI** — `facteval check` for scripting and CI/CD
+
+---
+
+## 📊 Comparison
+
+| Feature | FactEval | FacTool | QAFactEval |
+|---------|----------|---------|------------|
+| **Claim-level granularity** | ✅ | ✅ | ❌ |
+| **Calibrated confidence scores** | ✅ | ❌ | ❌ |
+| **Pipeline Diagnostics (why it failed)** | ✅ | ❌ | ❌ |
+| **Sub-second mode (`fast_check`)** | ✅ | ❌ | ❌ |
+| **HTML highlighting output** | ✅ | ❌ | ❌ |
 
 ---
 

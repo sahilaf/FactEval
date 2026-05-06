@@ -7,25 +7,21 @@ Run on Colab: Upload facteval/ folder, then run this file.
 
 import json
 import gradio as gr
-from facteval import check, verify
+from facteval import analyze, fast_check
 
 EXAMPLES = [
     [
-        "Paris is the capital of Germany and has 5 million people.",
-        "Paris is the capital of France. Paris has approximately 2.2 million inhabitants.\nGermany's capital is Berlin.",
+        "Patient presents with acute appendicitis. Given 500mg Amoxicillin. Discharge scheduled for tomorrow.",
+        "Patient was diagnosed with acute appendicitis and underwent successful appendectomy. Post-operative care includes IV fluids and rest. No antibiotics were administered. Patient will remain under observation for 48 hours."
     ],
     [
-        "Python was created by Guido van Rossum and first released in 2005.",
-        "Python was created by Guido van Rossum and first released in 1991.",
+        "Tesla's Q3 revenue reached $25 billion, a 40% year-over-year increase. The company delivered 500,000 vehicles in the quarter.",
+        "Tesla reported Q3 revenue of $23.35 billion, representing a 9% year-over-year increase. Vehicle deliveries for the quarter totaled 435,059."
     ],
     [
-        "The Amazon rainforest produces 20% of the world's oxygen and spans across nine countries.",
-        "The Amazon rainforest produces about 6% of the world's oxygen.\nThe Amazon rainforest spans across nine countries in South America.",
-    ],
-    [
-        "Albert Einstein developed the theory of relativity and won the Nobel Prize in Physics in 1921 for his work on the photoelectric effect.",
-        "Albert Einstein developed the theory of relativity. He won the Nobel Prize in Physics in 1921 for his explanation of the photoelectric effect.",
-    ],
+        "To start a React project, run `npm init react-app my-app` in your terminal. This will install React v17 by default.",
+        "To create a new React single-page application, the recommended command is `npx create-react-app my-app`. This installs the latest stable version of React, currently v18."
+    ]
 ]
 
 
@@ -39,7 +35,7 @@ def run_check(answer: str, contexts: str, calibrator_path: str = ""):
         return "⚠️ Please enter at least one context passage.", "", "", ""
 
     cal_path = calibrator_path.strip() if calibrator_path.strip() else None
-    result = check(answer, context_list, calibrator_path=cal_path)
+    result = analyze(answer, context_list, calibrator_path=cal_path)
 
     # 1. Highlighted answer (the viral feature)
     highlighted_html = f"""
@@ -159,11 +155,13 @@ with gr.Blocks(
             answer_input = gr.Textbox(
                 label="LLM Answer",
                 placeholder="Enter the text to fact-check...",
+                value=EXAMPLES[0][0],
                 lines=4,
             )
             context_input = gr.Textbox(
                 label="Reference Contexts (one per line)",
                 placeholder="Enter ground truth passages, one per line...",
+                value=EXAMPLES[0][1],
                 lines=5,
             )
             calibrator_input = gr.Textbox(
@@ -196,6 +194,12 @@ with gr.Blocks(
         examples=EXAMPLES,
         inputs=[answer_input, context_input],
         label="Try these examples",
+    )
+
+    demo.load(
+        fn=run_check,
+        inputs=[answer_input, context_input, calibrator_input],
+        outputs=[highlighted_output, details_output, summary_output, json_output],
     )
 
 if __name__ == "__main__":

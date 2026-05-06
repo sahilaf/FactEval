@@ -71,7 +71,7 @@ def _get_calibrator(path: str | None = None) -> Calibrator:
 
 # ── Full pipeline ────────────────────────────────────────────────────────────
 
-def check(
+def analyze(
     answer: str,
     contexts: list[str],
     top_k: int = 3,
@@ -115,7 +115,7 @@ def check(
 
 # ── Lightweight mode ─────────────────────────────────────────────────────────
 
-def verify(
+def fast_check(
     claims: list[str],
     contexts: list[str],
     top_k: int = 3,
@@ -134,7 +134,7 @@ def verify(
         calibrator_path: Path to a pre-fitted calibrator pickle file.
 
     Returns:
-        Same output format as check().
+        Same output format as analyze().
     """
     t0 = time.perf_counter()
 
@@ -190,15 +190,28 @@ def _run_pipeline(
     for cd in claim_dicts:
         cd["diagnostics"] = _diagnose(cd)
 
+    summary = _build_summary(results)
+    
+    # User feedback logging (feels alive)
+    hallucinations = summary.get("contradicted", 0)
+    supported = summary.get("supported", 0)
+    print(f"✔ Found {hallucinations} hallucination(s)")
+    print(f"✔ {supported} supported claim(s)")
+
     return {
         "claims": claim_dicts,
-        "summary": _build_summary(results),
+        "summary": summary,
         "highlighted_answer": _highlight_answer_semantic(
             answer, claim_dicts, retriever.embedder
         ),
         "calibrated": calibrator.is_calibrated,
         "pipeline_time_seconds": round(elapsed, 3),
     }
+
+# Backward compatibility aliases
+check = analyze
+verify = fast_check
+evaluate = analyze
 
 
 # ── Diagnostics ──────────────────────────────────────────────────────────────
